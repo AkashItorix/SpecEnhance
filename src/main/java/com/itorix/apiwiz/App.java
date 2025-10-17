@@ -124,9 +124,19 @@ public class App {
                         if(!responseContent.contains("```json")){
                                 JsonNode jsonNode = objectMapper.readValue(responseContent,JsonNode.class);
                                 String title = jsonNode.get("info").get("title").asText();
-                                try (FileWriter writer = new FileWriter(file)) {
-                                    writer.write(responseContent);
+                            FileWriter writer = null;
+                            try {
+                                writer = new FileWriter(file);
+                                writer.write(responseContent);
+                            } finally {
+                                if (writer != null) {
+                                    try {
+                                        writer.close();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
+                            }
                                 File renamedFile = new File(file.getParent() + File.separator +  title + ".json");
                                 file.renameTo(renamedFile);
                         }
