@@ -115,13 +115,13 @@ public class App {
                     ResponseEntity<String> exchange = restTemplate.exchange(openAiUrl,
                             HttpMethod.POST, request, String.class);
                     if(exchange.getStatusCode().is2xxSuccessful()) {
+                        try {
                         JsonNode responseNode = objectMapper.readValue(exchange.getBody(), JsonNode.class);
                         JsonNode choicesNode = responseNode.get("choices");
                         JsonNode firstChoice = choicesNode.get(0);
                         JsonNode contentNode = firstChoice.get("message");
                         String responseContent = contentNode.get("content").asText();
                         if(!responseContent.contains("```json")){
-                            try {
                                 JsonNode jsonNode = objectMapper.readValue(responseContent,JsonNode.class);
                                 String title = jsonNode.get("info").get("title").asText();
                                 try (FileWriter writer = new FileWriter(file)) {
@@ -129,9 +129,9 @@ public class App {
                                 }
                                 File renamedFile = new File(file.getParent() + File.separator +  title + ".json");
                                 file.renameTo(renamedFile);
-                            }catch (Exception ex){
-                                ex.printStackTrace();
-                            }
+                        }
+                        }catch (Exception ex){
+//                                ex.printStackTrace();
                         }
                     }
                 }
